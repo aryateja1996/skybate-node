@@ -19,12 +19,6 @@ jobs:
       with:
         node-version: '18.x'  # Specify the version of Node.js (adjust as needed)
 
-    - name: Install dependencies
-      run: npm install  # Install necessary dependencies
-
-    - name: Build the project
-      run: npm run build  # Run the build script
-
     - name: Upload build files via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Use an FTP action to upload files
       with:
