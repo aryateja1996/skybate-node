@@ -1,0 +1,51 @@
+name: Deploy to cPanel using FTP and SSH
+
+on:
+  push:
+    branches:
+      - main  # Triggers on push to the main branch, change as needed
+
+jobs:
+  deploy:
+    name: Deploy build files and run commands via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3  # Check out the repository code
+
+    - name: Set up Node.js environment
+      uses: actions/setup-node@v3  # Set up Node.js environment for running npm
+      with:
+        node-version: '18.x'  # Specify the version of Node.js (adjust as needed)
+
+    - name: Install dependencies
+      run: npm install  # Install necessary dependencies
+
+    - name: Build the project
+      run: npm run build  # Run the build script
+
+    - name: Upload build files via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Use an FTP action to upload files
+      with:
+        server: ${{ secrets.FTP_HOST }}       # FTP Host (e.g., ftp.example.com)
+        username: ${{ secrets.FTP_USERNAME }}  # FTP Username
+        password: ${{ secrets.FTP_PASSWORD }}  # FTP Password
+        local-dir: ./                  # Local directory containing build files (adjust based on your project structure)
+        server-dir: /api/         # Remote directory on the FTP server
+
+
+    - name: SSH into server and run commands
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.SSH_HOST }}        # Your server's SSH host (e.g., 123.456.789.012)
+        username: ${{ secrets.SSH_USERNAME }}  # SSH username
+        password: ${{ secrets.SSH_PASSWORD }}  # SSH password (use this if no SSH key is available)
+        port: 22                             # SSH port, usually 22
+        script: |
+          source /home2/skybatein/nodevenv/api/16/bin/activate && cd /home2/skybatein/api               # Navigate to your project directory on the server
+          npm install                      # Install dependencies on the server
+          npm start                        # Start the application
+          
+    - name: Success message
+      run: echo "Build files have been deployed and commands have been executed successfully."
