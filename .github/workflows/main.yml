@@ -29,18 +29,18 @@ jobs:
         server-dir: /api/         # Remote directory on the FTP server
 
 
-    - name: SSH into server and run commands
-      uses: appleboy/ssh-action@v0.1.8
-      with:
-        host: ${{ secrets.SSH_HOST }}        # Your server's SSH host (e.g., 123.456.789.012)
-        username: ${{ secrets.SSH_USERNAME }}  # SSH username
-        key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH password (use this if no SSH key is available)
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        port: 22                             # SSH port, usually 22
-        script: |
-          source /home2/skybatein/nodevenv/api/16/bin/activate && cd /home2/skybatein/api               # Navigate to your project directory on the server
-          npm install                      # Install dependencies on the server
-          npm start                        # Start the application
+    # - name: SSH into server and run commands
+    #   uses: appleboy/ssh-action@v0.1.8
+    #   with:
+    #     host: ${{ secrets.SSH_HOST }}        # Your server's SSH host (e.g., 123.456.789.012)
+    #     username: ${{ secrets.SSH_USERNAME }}  # SSH username
+    #     key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH password (use this if no SSH key is available)
+    #     passphrase: ${{ secrets.SSH_PASSPHRASE }}
+    #     port: 22                             # SSH port, usually 22
+    #     script: |
+    #       source /home2/skybatein/nodevenv/api/16/bin/activate && cd /home2/skybatein/api               # Navigate to your project directory on the server
+    #       npm install                      # Install dependencies on the server
+    #       npm start                        # Start the application
           
     - name: Success message
       run: echo "Build files have been deployed and commands have been executed successfully."
