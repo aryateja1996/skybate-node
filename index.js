@@ -119,10 +119,10 @@ if (cluster.isMaster && false) {
                         accept: "application/json",
                     },
                 })
-                .then(async function (response) {
+                .then( function (response) {
                     console.log("response->", response.data);
                     if (response.data && response.data.code === "PAYMENT_SUCCESS") {
-                      await  db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
+                        db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
                             "name": requestBody.name,
                             "phone": requestBody.phone,
                             "email": requestBody.email,
@@ -135,7 +135,7 @@ if (cluster.isMaster && false) {
                         logStream.write(`${APP_URL} appurls --- sucess-payment`)
                         // res.send(response.data);
                     } else {
-                        await db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
+                         db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
                             "name": requestBody.name,
                             "phone": requestBody.phone,
                             "email": requestBody.email,
