@@ -37,6 +37,7 @@ if (cluster.isMaster) {
         logStream.write("Hello World working")
         res.send("working")
     })
+    
     //"redirectUrl": `${APP_URL}/redirect?key=${merchantTransactionId}`,
     app.post('/pay/:paymentFor', function (req, res) {
         let endpoint = '/pg/v1/pay'
