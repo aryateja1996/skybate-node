@@ -63,6 +63,7 @@ if (cluster.isMaster && false) {
             "email": requestBody.email,
             "experience": requestBody.experience,
             "interests": requestBody.interest,
+            "transactionId": merchantTransactionId,
             "requirments":requestBody.requirements,
             "payment_status": "PENDING",
         })
