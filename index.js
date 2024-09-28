@@ -4,7 +4,7 @@ const cors = require("cors");
 const axios = require("axios");
 const sha256 = require("sha256");
 const uniqid = require("uniqid");
-const { MERCHANT_ID, PHONE_PE_HOST_URL, SALT_INDEX, SALT_KEY, APP_URL } = require("./consts/phonepe");
+const { MERCHANT_ID, PHONE_PE_HOST_URL, SALT_INDEX, SALT_KEY, APP_URL, NODE_URL } = require("./consts/phonepe");
 const { uniqueTransactionId, xVerify, convertToBase64 } = require('./consts/phonepe_functions')
 const app = express();
 const fs = require('fs')
@@ -46,9 +46,9 @@ if (cluster.isMaster) {
             "merchantTransactionId": merchantTransactionId,
             "merchantUserId": req.body.userId,
             "amount": req.body.amount * 100,
-            "redirectUrl": `https://api.skybate.in/paymentverify/${merchantTransactionId}`,
+            "redirectUrl": `${ NODE_URL + merchantTransactionId}`,
             "redirectMode": "REDIRECT",
-            "mobileNumber": `${req.body.phoneNumber}`,
+            "mobileNumber": `${req.body.phone}`,
             "paymentInstrument": {
                 "type": "PAY_PAGE"
             }
@@ -58,10 +58,11 @@ if (cluster.isMaster) {
 
         db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).create({
             "name": requestBody.name,
-            "phone": requestBody.phoneNumber,
+            "phone": requestBody.phone,
             "email": requestBody.email,
             "experience": requestBody.experience,
-            "interests": requestBody.interests,
+            "interests": requestBody.interest,
+            "requirments":requestBody.requirments,
             "payment_status": "PENDING",
         })
 
@@ -82,7 +83,6 @@ if (cluster.isMaster) {
             .request(options)
             .then(function (response) {
                 console.log(normalPayload);
-
                 //   res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
                 res.send({ "redirectUrl": response.data.data.instrumentResponse.redirectInfo.url })
             })
@@ -118,14 +118,31 @@ if (cluster.isMaster) {
                         accept: "application/json",
                     },
                 })
-                .then(function (response) {
+                .then(async function (response) {
                     console.log("response->", response.data);
                     if (response.data && response.data.code === "PAYMENT_SUCCESS") {
-                        // redirect to FE payment success status page
+                      await  db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
+                            "name": requestBody.name,
+                            "phone": requestBody.phone,
+                            "email": requestBody.email,
+                            "experience": requestBody.experience,
+                            "interests": requestBody.interest,
+                            "requirments":requestBody.requirments,
+                            "payment_status": "SUCCESS",
+                        })
                         res.redirect(`${APP_URL}sucess-payment`)
                         logStream.write(`${APP_URL} appurls --- sucess-payment`)
                         // res.send(response.data);
                     } else {
+                        await db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
+                            "name": requestBody.name,
+                            "phone": requestBody.phone,
+                            "email": requestBody.email,
+                            "experience": requestBody.experience,
+                            "interests": requestBody.interest,
+                            "requirments":requestBody.requirments,
+                            "payment_status": "Failed",
+                        })
                         // redirect to FE payment failure / pending status page
                         res.redirect(`${APP_URL}fail-payment`)
                     }
