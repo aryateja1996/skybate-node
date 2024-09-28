@@ -93,7 +93,7 @@ if (cluster.isMaster && false) {
             });
     })
 
-    app.get("/paymentverify/:merchantTransactionId", async function (req, res) {
+    app.get("/paymentverify/:merchantTransactionId",  function (req, res) {
 
         logStream.write('Came Here But Galanthu')
         const { merchantTransactionId } = req.params;
@@ -119,31 +119,15 @@ if (cluster.isMaster && false) {
                         accept: "application/json",
                     },
                 })
-                .then(async function (response) {
+                .then( function (response) {
                     console.log("response->", response.data);
                     if (response.data && response.data.code === "PAYMENT_SUCCESS") {
-                      await  db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
-                            "name": requestBody.name,
-                            "phone": requestBody.phone,
-                            "email": requestBody.email,
-                            "experience": requestBody.experience,
-                            "interests": requestBody.interest,
-                            "requirments":requestBody.requirments,
-                            "payment_status": "SUCCESS",
-                        })
+                     
                         res.redirect(`${APP_URL}sucess-payment`)
                         logStream.write(`${APP_URL} appurls --- sucess-payment`)
                         // res.send(response.data);
                     } else {
-                        await db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).update({
-                            "name": requestBody.name,
-                            "phone": requestBody.phone,
-                            "email": requestBody.email,
-                            "experience": requestBody.experience,
-                            "interests": requestBody.interest,
-                            "requirments":requestBody.requirments,
-                            "payment_status": "Failed",
-                        })
+                       
                         // redirect to FE payment failure / pending status page
                         res.redirect(`${APP_URL}fail-payment`)
                     }
