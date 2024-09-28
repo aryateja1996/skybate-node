@@ -63,7 +63,7 @@ if (cluster.isMaster && false) {
             "email": requestBody.email,
             "experience": requestBody.experience,
             "interests": requestBody.interest,
-            "requirments":requestBody.requirments,
+            "requirments":requestBody.requirements,
             "payment_status": "PENDING",
         })
 
@@ -128,7 +128,7 @@ if (cluster.isMaster && false) {
                             "email": requestBody.email,
                             "experience": requestBody.experience,
                             "interests": requestBody.interest,
-                            "requirments":requestBody.requirments,
+                            "requirments":requestBody.requirements,
                             "payment_status": "SUCCESS",
                         })
                         res.redirect(`${APP_URL}sucess-payment`)
@@ -141,7 +141,7 @@ if (cluster.isMaster && false) {
                             "email": requestBody.email,
                             "experience": requestBody.experience,
                             "interests": requestBody.interest,
-                            "requirments":requestBody.requirments,
+                            "requirments":requestBody.requirements,
                             "payment_status": "Failed",
                         })
                         // redirect to FE payment failure / pending status page
