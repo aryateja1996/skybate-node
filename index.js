@@ -122,9 +122,11 @@ if (cluster.isMaster && false) {
                 .then( function (response) {
                     console.log("response->", response.data);
                     if (response.data && response.data.code === "PAYMENT_SUCCESS") {
-                       
-                        res.redirect(`${APP_URL}sucess-payment`)
-                        logStream.write(`${APP_URL} appurls --- sucess-payment`)
+                        const paymentData = response.data;  // The whole object
+                        const encodedData = base64url.encode(JSON.stringify(paymentData)); // Encode the object
+                    
+                        // Redirect to success page with encoded data
+                        res.redirect(`${APP_URL}success-payment?data=${encodedData}`);
                         // res.send(response.data);
                     } else {
                         
