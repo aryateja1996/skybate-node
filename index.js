@@ -37,7 +37,23 @@ if (cluster.isMaster && false) {
         logStream.write("Hello World working")
         res.send("working")
     })
-    
+    app.post('/saveDetails/:saveFor',(req,res)=>{
+        var requestBody = req.body;
+        
+        db.collection(`${req.params.saveFor}`)
+        .doc()
+        .create({ 
+          "details": requestBody, 
+          "paymentDetails": 'NOTDONE' 
+        })
+        .then(() => {
+          res.status(200).send({ "status": 200 });
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+          res.status(500).send({ "status": 500, "error": error.message });
+        });
+    })
     //"redirectUrl": `${APP_URL}/redirect?key=${merchantTransactionId}`,
     app.post('/pay/:paymentFor', function (req, res) {
         let endpoint = '/pg/v1/pay'
@@ -54,19 +70,6 @@ if (cluster.isMaster && false) {
                 "type": "PAY_PAGE"
             }
         }
-        var requestBody = req.body;
-        console.log(requestBody);
-
-        db.collection(`${req.params.paymentFor}`).doc(merchantTransactionId).create({
-            "name": requestBody.name,
-            "phone": requestBody.phone,
-            "email": requestBody.email,
-            "experience": requestBody.experience,
-            "interests": requestBody.interest,
-            "transactionId": merchantTransactionId,
-            "requirments":requestBody.requirements,
-            "payment_status": "PENDING",
-        })
 
         logStream.write(`${normalPayload} \n Normal Payload is above`)
         const options = {
