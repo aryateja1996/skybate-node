@@ -125,12 +125,15 @@ if (cluster.isMaster && false) {
                 })
                 .then( function (response) {
                     console.log("response->", response.data);
+                    console.log(response.data.code)
                     if (response.data && response.data.code === "PAYMENT_SUCCESS") {
-                        const paymentData = response.data;  // The whole object
-                        const encodedData = base64url.encode(JSON.stringify(paymentData)); // Encode the object
-                    
+                    //     console.log("inside the if block")
+                    //     const paymentData = response.data;  // The whole object
+                    //     // const encodedData = base64url.encode(JSON.stringify(paymentData)); // Encode the object
+                    // const encodedData = base64url.encode(`${merchantTransactionId}`)
+                    // console.log(paymentData); console.log(encodedData);
                         // Redirect to success page with encoded data
-                        res.redirect(`${APP_URL}success-payment?data=${encodedData}`);
+                        res.redirect(`${APP_URL}sucess-payment?data=${merchantTransactionId}`);
                         // res.send(response.data);
                     } else {
                         
@@ -148,6 +151,50 @@ if (cluster.isMaster && false) {
             res.send("Sorry!! Error");
         }
     });
+
+    app.get("/paymentverifyafter/:merchantTransactionId",  function (req, res) {
+
+        logStream.write('Came Here But Galanthu')
+        const { merchantTransactionId } = req.params;
+        // check the status of the payment using merchantTransactionId
+        let endpoint = "/pg/v1/status/";
+        if (merchantTransactionId) {
+            let statusUrl =
+                `${PHONE_PE_HOST_URL + endpoint + MERCHANT_ID}/` +
+                merchantTransactionId;
+
+            // generate X-VERIFY
+            let string =
+                `${endpoint}${MERCHANT_ID}/` + merchantTransactionId + SALT_KEY;
+            let sha256_val = sha256(string);
+            let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
+
+            axios
+                .get(statusUrl, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-VERIFY": xVerifyChecksum,
+                        "X-MERCHANT-ID": MERCHANT_ID,
+                        accept: "application/json",
+                    },
+                })
+                .then( function (response) {
+                    console.log("response->", response.data);
+                    console.log(response.data.code)
+                    res.send(response.data)
+                })
+                .catch(function (error) {
+                    // redirect to FE payment failure / pending status page
+                    logStream.write(`Error :: ${error}`)
+                    res.send(error);
+                });
+        } else {
+            logStream.write("Sorry!! ERROR no merchantTransactionId")
+            res.send("Sorry!! Error");
+        }
+    });
+
+
 
 
 
